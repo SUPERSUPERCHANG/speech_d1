@@ -7,10 +7,6 @@
 int main()
 {
     TcpSocket server;
-    int port = 9000;
-    int timeout = 3000;
-    std::string ip = "127.0.0.1";
-    server.connectTo(ip, port, timeout);
 
     ArmSpeechControl armSpeechControl;
     armSpeechControl.init();
@@ -22,7 +18,7 @@ int main()
         // Wait for a new connection
         TcpSocket client = server.accept(&clientIp, &clientPort);
         if (!client.valid()) {
-            std::cerr << "Accept failed\n";
+            std::cerr << "Waiting for connection...\n";
             continue;
         }
 
