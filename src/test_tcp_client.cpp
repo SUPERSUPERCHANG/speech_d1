@@ -2,11 +2,21 @@
 #include <iostream>
 #include <string>
 
-int main() {
+int main(int argc, char* argv[]) {
+
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <server_ip> [port]\n";
+        return 1;
+    }
+
+    std::string ip = argv[1];
+    int port = 9000;  // 默认端口
+    if (argc >= 3) port = std::stoi(argv[2]);
+
     TcpSocket client;
 
     // Connect to localhost:9000 (you can change IP or port)
-    if (!client.connectTo("192.168.0.114", 9000, 3000)) {
+    if (!client.connectTo(ip, 9000, 3000)) {
         std::cerr << "Failed to connect to server\n";
         return 1;
     }

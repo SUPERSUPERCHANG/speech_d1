@@ -4,6 +4,18 @@
 
 #include "tcp_arm_speech_control.hpp"
 
+// --- helpers: trim \r \n
+static inline void lstrip(std::string &s) {
+    size_t i = 0;
+    while (i < s.size() && std::isspace(static_cast<unsigned char>(s[i]))) ++i;
+    if (i) s.erase(0, i);
+}
+static inline void rstrip(std::string &s) {
+    while (!s.empty() && std::isspace(static_cast<unsigned char>(s.back())))
+        s.pop_back();
+}
+static inline std::string trim(std::string s) { lstrip(s); rstrip(s); return s; }
+
 int main()
 {
     TcpSocket server;
@@ -44,8 +56,9 @@ int main()
                           << clientIp << ":" << clientPort << "\n";
                 break;
             }
-
             std::string msg(buffer, buffer + bytes);
+
+            msg = trim(msg);
             armSpeechControl.process_command(msg);
             std::cout << "Received: " << msg;
             // Echo the same message back
