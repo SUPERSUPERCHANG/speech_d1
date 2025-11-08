@@ -7,6 +7,13 @@
 int main()
 {
     TcpSocket server;
+    // Bind to port 9000 and start listening
+    if (!server.bindAndListen(9000)) {
+        std::cerr << "Failed to bind or listen on port 9000\n";
+        return 1;
+    }
+
+    std::cout << "Server is listening on port 9000...\n";
 
     ArmSpeechControl armSpeechControl;
     armSpeechControl.init();
