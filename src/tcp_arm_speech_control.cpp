@@ -9,8 +9,8 @@ int main()
     TcpSocket server;
     int port = 9000;
     int timeout = 3000;
-    string ip = "127.0.0.1";
-    server.connectTo(string, port, timeout);
+    std::string ip = "127.0.0.1";
+    server.connectTo(ip, port, timeout);
 
     ArmSpeechControl armSpeechControl;
     armSpeechControl.init();

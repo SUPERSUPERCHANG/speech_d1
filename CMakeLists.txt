@@ -33,3 +33,5 @@ target_link_libraries(test_tcp_server PRIVATE tcp_socket pthread)
 add_executable(test_tcp_client src/test_tcp_client.cpp)
 target_link_libraries(test_tcp_client PRIVATE tcp_socket pthread)
 
+add_executable(tcp_arm_speech_control src/tcp_arm_speech_control.cpp src/tcp_socket.cpp src/arm_speech_control.cpp src/msg/PubServoInfo_.cpp src/msg/ArmString_.cpp)
+target_link_libraries(test_tcp_client PRIVATE tcp_socket pthread arm_speech_control)
