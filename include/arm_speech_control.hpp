@@ -16,6 +16,19 @@
 using namespace unitree::robot;
 using namespace unitree::common;
 
+
+typedef struct ArmJointAngles
+{
+    double angle0;
+    double angle1;
+    double angle2;
+    double angle3;
+    double angle4;
+    double angle5;
+    double angle6;
+} ArmJointAngles;
+
+
 class ArmSpeechControl
 {
 public:
@@ -35,7 +48,10 @@ public:
     void move_single();
     void move_all();
     void process_command(const std::string& command);
+    void angle_handler(const void* msg);
 
+    unitree_arm::msg::dds_::PubServoInfo_* feedback_msg_;
+    std::unordered_map<std::string, int> nameToIndex_;
 private:
 
     std::unique_ptr<ChannelPublisher<unitree_arm::msg::dds_::ArmString_>> publisher_;
