@@ -65,13 +65,5 @@ int main()
             client.sendAll(msg);
         }
     }
-
-
-
-
-
-
-
-
 return 0;
 }

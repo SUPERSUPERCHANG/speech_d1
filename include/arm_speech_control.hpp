@@ -42,16 +42,18 @@ public:
     // gripper
     void open_gripper();
     void close_gripper();
-    void handle_joint();
-    void hold_joint();
-    void zero_joint();
-    void move_single();
-    void move_all();
+    bool handle_joint();
+    bool hold_joint();
+    bool zero_joint();
+    void move_single(int id, double angleDeg);
+    void move_all(ArmJointAngles targetAnglesDeg);
     void process_command(const std::string& command);
     void angle_handler(const void* msg);
+    bool is_move_success(const ArmJointAngles& targetAnglesDeg, double tolDeg);
 
-    unitree_arm::msg::dds_::PubServoInfo_* feedback_msg_;
+    ArmJointAngles feedback_angles_;
     std::unordered_map<std::string, int> nameToIndex_;
+
 private:
 
     std::unique_ptr<ChannelPublisher<unitree_arm::msg::dds_::ArmString_>> publisher_;

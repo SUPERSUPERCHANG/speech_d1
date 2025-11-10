@@ -1,0 +1,24 @@
+//
+// Created by chang on 11/10/25.
+//
+
+#ifndef D1_ARM_SPEECH_CONTROL_FSMLIST_HPP
+#define D1_ARM_SPEECH_CONTROL_FSMLIST_HPP
+
+#include <tinyfsm.hpp>
+#include <arm_fsm.hpp>
+
+using fsm_list = tinyfsm::FsmList<Arm>;
+
+/** dispatch event to Arm */
+template<typename E>
+void send_event(E const & event)
+{
+    fsm_list::template dispatch<E>(event);
+}
+
+
+
+
+
+#endif //D1_ARM_SPEECH_CONTROL_FSMLIST_HPP
