@@ -71,5 +71,5 @@ target_link_libraries(tcp_arm_speech_control PRIVATE tcp_socket arm_speech_contr
 
 # 5) 综合：TCP + ArmFSM
 add_executable(demo_fsm src/demo_fsm.cpp)
-target_link_libraries(demo_fsm PRIVATE arm_fsm arm_speech_control ${THIRD_PARTY_LIBS})
+target_link_libraries(demo_fsm PRIVATE tcp_socket arm_fsm arm_speech_control ${THIRD_PARTY_LIBS})
 target_include_directories(demo_fsm PRIVATE ${PROJECT_SOURCE_DIR}/include ${THIRD_PARTY_INCLUDES})
