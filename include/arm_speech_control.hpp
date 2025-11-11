@@ -28,6 +28,11 @@ typedef struct ArmJointAngles
     double angle6;
 } ArmJointAngles;
 
+inline const std::unordered_map<std::string, ArmJointAngles> armTargets = {
+    {"handle", {0.0, 20.0, -30.0, 0.0, -30.0, 0.0, 0.0}},
+    {"hold",   {0.0, -90.0, 90.0, 0.0,  0.0,  0.0, 0.0}},
+    {"zero",   {0.0, 0.0,   0.0,  0.0,  0.0,  0.0, 0.0}},
+};
 
 class ArmSpeechControl
 {
@@ -42,9 +47,9 @@ public:
     // gripper
     void open_gripper();
     void close_gripper();
-    bool handle_joint();
-    bool hold_joint();
-    bool zero_joint();
+    void handle_joint();
+    void hold_joint();
+    void zero_joint();
     void move_single(int id, double angleDeg);
     void move_all(ArmJointAngles targetAnglesDeg);
     void process_command(const std::string& command);

@@ -49,7 +49,7 @@ target_sources(arm_fsm PRIVATE
         src/arm_fsm.cpp
 )
 target_include_directories(arm_fsm
-        PUBLIC ${PROJECT_SOURCE_DIR}/include
+        PUBLIC ${PROJECT_SOURCE_DIR}/include ${THIRD_PARTY_INCLUDES}
 )
 
 # ============ 可执行文件 ============
@@ -59,17 +59,17 @@ target_link_libraries(local_arm_speech_control PRIVATE arm_speech_control)
 
 # 2) TCP 服务器
 add_executable(test_tcp_server src/test_tcp_server.cpp)
-target_link_libraries(test_tcp_server PRIVATE tcp_socket pthread)
+target_link_libraries(test_tcp_server PRIVATE tcp_socket )
 
 # 3) TCP 客户端
 add_executable(test_tcp_client src/test_tcp_client.cpp)
-target_link_libraries(test_tcp_client PRIVATE tcp_socket pthread)
+target_link_libraries(test_tcp_client PRIVATE tcp_socket)
 
 # 4) 综合：TCP + Arm（不再重复列 .cpp，只链接库）
 add_executable(tcp_arm_speech_control src/tcp_arm_speech_control.cpp)
-target_link_libraries(tcp_arm_speech_control PRIVATE tcp_socket arm_speech_control pthread)
+target_link_libraries(tcp_arm_speech_control PRIVATE tcp_socket arm_speech_control)
 
 # 5) 综合：TCP + ArmFSM
 add_executable(demo_fsm src/demo_fsm.cpp)
-target_link_libraries(demo_fsm pthread arm_fsm)
-target_include_directories(demo_fsm PRIVATE include)
+target_link_libraries(demo_fsm PRIVATE arm_fsm arm_speech_control ${THIRD_PARTY_LIBS})
+target_include_directories(demo_fsm PRIVATE ${PROJECT_SOURCE_DIR}/include ${THIRD_PARTY_INCLUDES})

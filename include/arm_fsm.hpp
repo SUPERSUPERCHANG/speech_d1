@@ -6,7 +6,12 @@
 #define D1_ARM_SPEECH_CONTROL_ARM_FSM_HPP
 
 #include <tinyfsm.hpp>
+
 #include <iostream>
+#include <cassert>
+
+class ArmSpeechControl;
+
 
 // ---------- Event ---------- //
 struct MoveZero   : tinyfsm::Event { };
@@ -23,8 +28,8 @@ class Open;
 class Close;
 
 
-class Arm
-: public tinyfsm::Fsm<Arm>
+class ArmFSM
+: public tinyfsm::Fsm<ArmFSM>
 {
     /* NOTE: react(), entry() and exit() functions need to be accessible
      * from tinyfsm::Fsm class. You might as well declare friendship to
@@ -44,14 +49,25 @@ public:
     void react(MoveOpen const &);
     void react(MoveClose const &);
 
+    // virtual bool isStateReached(void) = 0;
     virtual void entry(void) = 0;  /* pure virtual: enforce implementation in all states */
     void exit(void)  { };          /* no exit actions at all */
 
     static std::string getCurrentStateName();
 
+    static void attachController(ArmSpeechControl& ctrl) { ctrl_ = &ctrl; }
+
 protected:
+    inline static bool isPreviousStateReached_ = false;
+    inline static std::string prevStateName_ = "";
 
+    static ArmSpeechControl& arm() {
+        assert(ctrl_ && "Arm controller not attached. Call Arm::attachController() first.");
+        return *ctrl_;
+    }
 
+private:
+    inline static ArmSpeechControl* ctrl_ = nullptr;   // 全局唯一控制器（依赖注入）
 
 };
 

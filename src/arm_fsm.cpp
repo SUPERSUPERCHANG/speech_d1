@@ -4,57 +4,66 @@
 // src/main.cpp
 
 #include "arm_fsm.hpp"
-
+#include <arm_speech_control.hpp>
 
 
 // ----------------------------------------------------------------------------
 // State: Zero
 //
 class Zero
-: public Arm
+: public ArmFSM
 {
     void entry() override {
-        std::cout << "Move to zero" << std::endl;
+        std::cout << "entry to zero" << std::endl;
+        arm().zero_joint();
     };
+    // bool isStateReached() override
+    // {
+    //
+    // }
 };
 // ----------------------------------------------------------------------------
 // State: Hold
 //
 class Hold
-: public Arm
+: public ArmFSM
 {
     void entry() override {
-        std::cout << "Hold" << std::endl;
+        std::cout << "entry to hold" << std::endl;
+        arm().hold_joint();
     };
 };
 // ----------------------------------------------------------------------------
 // State: Handle
 //
 class Handle
-: public Arm
+: public ArmFSM
 {
     void entry() override {
-        std::cout << "Handle" << std::endl;
+        std::cout << "entry to Handle" << std::endl;
+        arm().handle_joint();
     };
 };
 // ----------------------------------------------------------------------------
 // State: Open
 //
 class Open
-: public Arm
+: public ArmFSM
 {
     void entry() override {
-        std::cout << "Open" << std::endl;
+        std::cout << "entry to Open" << std::endl;
+        arm().open_gripper();
     };
 };
 // ----------------------------------------------------------------------------
 // State: Close
 //
 class Close
-: public Arm
+: public ArmFSM
 {
     void entry() override {
-        std::cout << "Close" << std::endl;
+        std::cout << "entry to Close" << std::endl;
+        arm().close_gripper();
     };
 };
 
@@ -62,42 +71,47 @@ class Close
 
 
 
-void Arm::react(MoveZero   const &)
+void ArmFSM::react(MoveZero   const &)
 {
-    std::cout << "MoveZero" << std::endl;
+    std::cout << "Move2Zero" << std::endl;
+    transit<Zero>();
 }
 
-void Arm::react(MoveHandle const &)
+void ArmFSM::react(MoveHandle const &)
 {
-    std::cout << "MoveHandle" << std::endl;
+    std::cout << "Move2Handle" << std::endl;
+    transit<Handle>();
 }
 
-void Arm::react(MoveHold const &)
+void ArmFSM::react(MoveHold const &)
 {
-    std::cout << "MoveHold" << std::endl;
+    std::cout << "Move2Hold" << std::endl;
+    transit<Hold>();
 }
 
-void Arm::react(MoveOpen const &)
+void ArmFSM::react(MoveOpen const &)
 {
-    std::cout << "MoveOpen" << std::endl;
+    std::cout << "Move2Open" << std::endl;
+    transit<Open>();
 }
 
-void Arm::react(MoveClose const &)
+void ArmFSM::react(MoveClose const &)
 {
-    std::cout << "MoveZero" << std::endl;
+    std::cout << "Move2Close" << std::endl;
+    transit<Close>();
 }
 
 
-std::string Arm::getCurrentStateName() {
-    if (Arm::template is_in_state<Zero>())   return "Zero";
-    if (Arm::template is_in_state<Hold>())   return "Hold";
-    if (Arm::template is_in_state<Handle>()) return "Handle";
-    if (Arm::template is_in_state<Open>())   return "Open";
-    if (Arm::template is_in_state<Close>())  return "Close";
+std::string ArmFSM::getCurrentStateName() {
+    if (ArmFSM::template is_in_state<Zero>())   return "Zero";
+    if (ArmFSM::template is_in_state<Hold>())   return "Hold";
+    if (ArmFSM::template is_in_state<Handle>()) return "Handle";
+    if (ArmFSM::template is_in_state<Open>())   return "Open";
+    if (ArmFSM::template is_in_state<Close>())  return "Close";
     return "Unknown";
 }
 
-FSM_INITIAL_STATE(Arm, Zero)
+FSM_INITIAL_STATE(ArmFSM, Zero)
 
 
 

@@ -60,23 +60,21 @@ void ArmSpeechControl::close_gripper()
 // ============================
 // arm
 // ============================
-bool ArmSpeechControl::handle_joint()
+void ArmSpeechControl::handle_joint()
 {
     std::cout << "[ArmSpeechControl] Handling joint..." << std::endl;
     // {0, 20, -30, 0, -30, 0, 0}
-    ArmJointAngles target{0.0, 20.0, -30.0, 0.0, -30.0, 0.0, 0.0};
-    move_all(target);
+    move_all(armTargets.at("handle"));
 }
 
-bool ArmSpeechControl::hold_joint()
+void ArmSpeechControl::hold_joint()
 {
     std::cout << "[ArmSpeechControl] Holding joint position..." << std::endl;
     // {0, -90, 90, 0, 0, 0, 0}
-    ArmJointAngles target{0.0, -90.0, 90.0, 0.0, 0.0, 0.0, 0.0};
-    move_all(target);
+    move_all(armTargets.at("hold"));
 }
 
-bool ArmSpeechControl::zero_joint()
+void ArmSpeechControl::zero_joint()
 {
     std::cout << "[ArmSpeechControl] Moving all joints to zero..." << std::endl;
     unitree_arm::msg::dds_::ArmString_ msg{};

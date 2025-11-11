@@ -1,13 +1,23 @@
 // src/main.cpp
-#include <iostream>
 #include "arm_fsm.hpp"
+#include <arm_speech_control.hpp>
+
 #include "fsmlist.hpp"
+
+
+#include <iostream>
+
+
 // 这里假设：
 // - 你已经在 arm_fsm.hpp(or .cpp) 里定义了事件类型：MoveZero, MoveHold, MoveHandle, MoveOpen, MoveClose（均继承 tinyfsm::Event）
 // - 以及 fsm_list = tinyfsm::FsmList<Zero, Hold, Handle, Open, Close>（或等价写法）
 // - 各状态类的 entry() 会打印如 "Move to zero" / "Hold" / "Handle" / "Open" / "Close"
 
 int main() {
+
+    ArmSpeechControl controller;
+    ArmFSM::attachController(controller);   // ★ 注入控制器 ★
+
     // 启动 TinyFSM（会触发初始状态的 entry()）
     fsm_list::start();
 
@@ -29,7 +39,6 @@ int main() {
             case 'z': {
                 send_event(MoveZero{});
                 std::cout << "[sent] MoveZero\n";
-
                 break;
             }
             case 'h': {
@@ -58,7 +67,7 @@ int main() {
                 return 0;
             }
             case 'w': {
-                std::cout << Arm::getCurrentStateName() <<"\n";
+                std::cout << ArmFSM::getCurrentStateName() <<"\n";
                 break;
             }
             default:

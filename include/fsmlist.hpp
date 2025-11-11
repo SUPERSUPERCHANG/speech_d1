@@ -8,7 +8,7 @@
 #include <tinyfsm.hpp>
 #include <arm_fsm.hpp>
 
-using fsm_list = tinyfsm::FsmList<Arm>;
+using fsm_list = tinyfsm::FsmList<ArmFSM>;
 
 /** dispatch event to Arm */
 template<typename E>
