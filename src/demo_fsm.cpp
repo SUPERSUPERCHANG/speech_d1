@@ -1,92 +1,70 @@
-#include <atomic>
-#include <chrono>
+// src/main.cpp
 #include <iostream>
-#include <string>
-#include <thread>
+#include "arm_fsm.hpp"
+#include "fsmlist.hpp"
+// 这里假设：
+// - 你已经在 arm_fsm.hpp(or .cpp) 里定义了事件类型：MoveZero, MoveHold, MoveHandle, MoveOpen, MoveClose（均继承 tinyfsm::Event）
+// - 以及 fsm_list = tinyfsm::FsmList<Zero, Hold, Handle, Open, Close>（或等价写法）
+// - 各状态类的 entry() 会打印如 "Move to zero" / "Hold" / "Handle" / "Open" / "Close"
 
-#include "tinyfsm.hpp"  // 确保能找到你本地的 tinyfsm.hpp
-
-// ---------- 事件 ----------
-struct TickEvent {};
-struct ModeCmdEvent { enum class Mode { Idle, Running, Exit } target; };
-
-// ---------- 基类状态机 ----------
-struct Machine : tinyfsm::Fsm<Machine> {
-  using fsmtype = Machine;
-  inline static ModeCmdEvent::Mode currentMode = ModeCmdEvent::Mode::Idle;
-
-  // 缺省事件处理
-  void react(const TickEvent&) {}
-  void react(const ModeCmdEvent& e) { currentMode = e.target; }
-
-  // 生命周期钩子（可选）
-  void entry() {}
-  void exit() {}
-};
-
-// ---------- 具体状态 ----------
-struct IdleState : Machine {
-  void entry() override { std::cout << "[Idle] entry\n"; }
-  void react(const TickEvent&) override {
-    // 看到目标模式变了就切换
-    if (currentMode == ModeCmdEvent::Mode::Running) transit<class RunningState>();
-  }
-};
-
-struct RunningState : Machine {
-  void entry() override { std::cout << "[Running] entry\n"; }
-  void react(const TickEvent&) override {
-    if (currentMode == ModeCmdEvent::Mode::Idle) transit<class IdleState>();
-  }
-};
-
-// 注册接收 dispatch(...) 的状态列表
-using fsmList = tinyfsm::FsmList<IdleState, RunningState>;
-
-// ---------- 主程序 ----------
 int main() {
-  // 启动（会调用第一个状态的 entry；如果需要其它初始状态，也可以先 dispatch 一个 ModeCmdEvent）
-  tinyfsm::start();
+    // 启动 TinyFSM（会触发初始状态的 entry()）
+    fsm_list::start();
 
-  std::atomic<ModeCmdEvent::Mode> nextMode{ModeCmdEvent::Mode::Idle};
-  std::atomic<bool> quit{false};
+    std::cout << "===== Arm FSM Tester =====\n"
+              << "z: MoveZero\n"
+              << "h: MoveHold\n"
+              << "n: MoveHandle\n"
+              << "o: MoveOpen\n"
+              << "c: MoveClose\n"
+              << "w: Current State\n"
+              << "q: Quit\n";
 
-  // 读输入线程（阻塞读），输入 idle / run / exit
-  std::thread inputThread([&] {
-    std::string line;
-    std::cout << "Type command: idle | run | exit\n";
-    while (std::getline(std::cin, line)) {
-      if (line == "idle") {
-        nextMode = ModeCmdEvent::Mode::Idle;
-      } else if (line == "run") {
-        nextMode = ModeCmdEvent::Mode::Running;
-      } else if (line == "exit") {
-        nextMode = ModeCmdEvent::Mode::Exit;
-        break;
-      } else {
-        std::cout << "Unknown cmd. Use: idle | run | exit\n";
-      }
+    while (true) {
+        std::cout << "\nCommand ? [z/h/n/o/c/q]: ";
+        char cmd;
+        if (!(std::cin >> cmd)) break;
+
+        switch (cmd) {
+            case 'z': {
+                send_event(MoveZero{});
+                std::cout << "[sent] MoveZero\n";
+
+                break;
+            }
+            case 'h': {
+                send_event(MoveHold{});
+                std::cout << "[sent] MoveHold\n";
+                break;
+            }
+            case 'n': {
+                // n ＝ handle（避免和 h=Hold 冲突）
+                send_event(MoveHandle{});
+                std::cout << "[sent] MoveHandle\n";
+                break;
+            }
+            case 'o': {
+                send_event(MoveOpen{});
+                std::cout << "[sent] MoveOpen\n";
+                break;
+            }
+            case 'c': {
+                send_event(MoveClose{});
+                std::cout << "[sent] MoveClose\n";
+                break;
+            }
+            case 'q': {
+                std::cout << "Bye!\n";
+                return 0;
+            }
+            case 'w': {
+                std::cout << Arm::getCurrentStateName() <<"\n";
+                break;
+            }
+            default:
+                std::cout << "Invalid input.\n";
+                break;
+        }
     }
-  });
-
-  // 定时轮询循环
-  using namespace std::chrono_literals;
-  while (!quit.load()) {
-    // 派发心跳
-    tinyfsm::dispatch(TickEvent{});
-
-    // 处理可能的模式变更
-    auto m = nextMode.load();
-    if (m == ModeCmdEvent::Mode::Exit) {
-      quit = true;
-    } else {
-      tinyfsm::dispatch(ModeCmdEvent{m});
-    }
-
-    std::this_thread::sleep_for(200ms);
-  }
-
-  if (inputThread.joinable()) inputThread.join();
-  std::cout << "Bye.\n";
-  return 0;
+    return 0;
 }

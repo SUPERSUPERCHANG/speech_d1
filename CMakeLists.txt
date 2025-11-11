@@ -43,6 +43,15 @@ target_include_directories(tcp_socket
         PUBLIC ${PROJECT_SOURCE_DIR}/include
 )
 
+# ============ 库：arm_fsm ============
+add_library(arm_fsm STATIC)
+target_sources(arm_fsm PRIVATE
+        src/arm_fsm.cpp
+)
+target_include_directories(arm_fsm
+        PUBLIC ${PROJECT_SOURCE_DIR}/include
+)
+
 # ============ 可执行文件 ============
 # 1) 本地测试：仅用 arm_speech_control
 add_executable(local_arm_speech_control src/local_arm_speech_control.cpp)
@@ -61,9 +70,6 @@ add_executable(tcp_arm_speech_control src/tcp_arm_speech_control.cpp)
 target_link_libraries(tcp_arm_speech_control PRIVATE tcp_socket arm_speech_control pthread)
 
 # 5) 综合：TCP + ArmFSM
-add_executable(arm_fsm_main src/arm_fsm.cpp)
-target_link_libraries(arm_fsm_main PRIVATE tcp_socket arm_speech_control pthread)
-
-add_executable(tinyfsm_demo src/demo_fsm.cpp)
-target_link_libraries(tinyfsm_demo pthread)
-target_include_directories(tinyfsm_demo PRIVATE include)
+add_executable(demo_fsm src/demo_fsm.cpp)
+target_link_libraries(demo_fsm pthread arm_fsm)
+target_include_directories(demo_fsm PRIVATE include)
