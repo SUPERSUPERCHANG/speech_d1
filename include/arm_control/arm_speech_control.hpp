@@ -9,9 +9,9 @@
 #include <string>
 #include <unitree/robot/channel/channel_publisher.hpp>
 #include <unitree/robot/channel/channel_subscriber.hpp>
-#include <PubServoInfo_.hpp>
+#include <../PubServoInfo_.hpp>
 #include <unitree/common/time/time_tool.hpp>
-#include "ArmString_.hpp"
+#include "../msg/ArmString_.hpp"
 
 using namespace unitree::robot;
 using namespace unitree::common;
@@ -28,11 +28,6 @@ typedef struct ArmJointAngles
     double angle6;
 } ArmJointAngles;
 
-inline const std::unordered_map<std::string, ArmJointAngles> armTargets = {
-    {"handle", {0.0, 20.0, -30.0, 0.0, -30.0, 0.0, 0.0}},
-    {"hold",   {0.0, -90.0, 90.0, 0.0,  0.0,  0.0, 0.0}},
-    {"zero",   {0.0, 0.0,   0.0,  0.0,  0.0,  0.0, 0.0}},
-};
 
 class ArmSpeechControl
 {
@@ -59,6 +54,11 @@ public:
     ArmJointAngles feedback_angles_;
     std::unordered_map<std::string, int> nameToIndex_;
 
+    inline static const std::unordered_map<std::string, ArmJointAngles> armTargets = {
+        {"handle", {0.0, 20.0, -30.0, 0.0, -30.0, 0.0, 0.0}},
+        {"hold",   {0.0, -90.0, 90.0, 0.0,  0.0,  0.0, 0.0}},
+        {"zero",   {0.0, 0.0,   0.0,  0.0,  0.0,  0.0, 0.0}},
+    };
 private:
 
     std::unique_ptr<ChannelPublisher<unitree_arm::msg::dds_::ArmString_>> publisher_;

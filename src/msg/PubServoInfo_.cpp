@@ -6,7 +6,7 @@
   Cyclone DDS: v0.10.2
 
 *****************************************************************/
-#include "PubServoInfo_.hpp"
+#include "../../include/msg/PubServoInfo_.hpp"
 
 namespace org{
 namespace eclipse{

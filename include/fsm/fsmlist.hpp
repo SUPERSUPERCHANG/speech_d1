@@ -5,7 +5,7 @@
 #ifndef D1_ARM_SPEECH_CONTROL_FSMLIST_HPP
 #define D1_ARM_SPEECH_CONTROL_FSMLIST_HPP
 
-#include <tinyfsm.hpp>
+#include <../tinyfsm.hpp>
 #include <arm_fsm.hpp>
 
 using fsm_list = tinyfsm::FsmList<ArmFSM>;

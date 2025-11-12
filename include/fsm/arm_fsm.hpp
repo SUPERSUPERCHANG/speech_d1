@@ -5,7 +5,7 @@
 #ifndef D1_ARM_SPEECH_CONTROL_ARM_FSM_HPP
 #define D1_ARM_SPEECH_CONTROL_ARM_FSM_HPP
 
-#include <tinyfsm.hpp>
+#include <../3rdparty/include/tinyfsm.hpp>
 
 #include <iostream>
 #include <cassert>
@@ -19,6 +19,7 @@ struct MoveHandle : tinyfsm::Event { };
 struct MoveHold : tinyfsm::Event { };
 struct MoveOpen : tinyfsm::Event {};
 struct MoveClose  : tinyfsm::Event {};
+struct Tick : tinyfsm::Event {};
 
 // ---------- States ---------- //
 class Zero;
@@ -48,6 +49,8 @@ public:
     void react(MoveHold const &);
     void react(MoveOpen const &);
     void react(MoveClose const &);
+
+    virtual void react(Tick const &)=0;
 
     // virtual bool isStateReached(void) = 0;
     virtual void entry(void) = 0;  /* pure virtual: enforce implementation in all states */

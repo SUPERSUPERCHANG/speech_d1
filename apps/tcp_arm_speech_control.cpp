@@ -1,10 +1,24 @@
-#include "tcp_socket.hpp"
-#include <iostream>
-#include <thread>
+//
+// Created by chang on 11/8/25.
+//
 
-int main() {
+#include "../include/arm_control/tcp_arm_speech_control.hpp"
+
+// --- helpers: trim \r \n
+static inline void lstrip(std::string &s) {
+    size_t i = 0;
+    while (i < s.size() && std::isspace(static_cast<unsigned char>(s[i]))) ++i;
+    if (i) s.erase(0, i);
+}
+static inline void rstrip(std::string &s) {
+    while (!s.empty() && std::isspace(static_cast<unsigned char>(s.back())))
+        s.pop_back();
+}
+static inline std::string trim(std::string s) { lstrip(s); rstrip(s); return s; }
+
+int main()
+{
     TcpSocket server;
-
     // Bind to port 9000 and start listening
     if (!server.bindAndListen(9000)) {
         std::cerr << "Failed to bind or listen on port 9000\n";
@@ -13,6 +27,9 @@ int main() {
 
     std::cout << "Server is listening on port 9000...\n";
 
+    ArmSpeechControl armSpeechControl;
+    armSpeechControl.init();
+
     while (true) {
         std::string clientIp;
         uint16_t clientPort = 0;
@@ -20,7 +37,7 @@ int main() {
         // Wait for a new connection
         TcpSocket client = server.accept(&clientIp, &clientPort);
         if (!client.valid()) {
-            std::cerr << "Accept failed\n";
+            std::cerr << "Waiting for connection...\n";
             continue;
         }
 
@@ -39,14 +56,14 @@ int main() {
                           << clientIp << ":" << clientPort << "\n";
                 break;
             }
-
             std::string msg(buffer, buffer + bytes);
-            std::cout << "Received: " << msg;
 
+            msg = trim(msg);
+            armSpeechControl.process_command(msg);
+            std::cout << "Received: " << msg;
             // Echo the same message back
             client.sendAll(msg);
         }
     }
-
-    return 0;
+return 0;
 }

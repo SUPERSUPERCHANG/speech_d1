@@ -3,9 +3,8 @@
 //
 // src/main.cpp
 
-#include "arm_fsm.hpp"
-#include <arm_speech_control.hpp>
-
+#include "../../include/fsm/arm_fsm.hpp"
+#include <../include/arm_control/arm_speech_control.hpp>
 
 // ----------------------------------------------------------------------------
 // State: Zero
@@ -16,11 +15,19 @@ class Zero
     void entry() override {
         std::cout << "entry to zero" << std::endl;
         arm().zero_joint();
-    };
-    // bool isStateReached() override
-    // {
-    //
-    // }
+    }
+    void react(Tick const &) override {
+        std::cout << "Tick" << std::endl;
+        if (arm().is_move_success(arm().armTargets.at("zero"),3)) {
+            isPreviousStateReached_=true;
+            std::cout << "arm is zero" << std::endl;
+        }
+        else {
+            isPreviousStateReached_=false;
+            std::cout << "arm is not zero, resend the cmd" << std::endl;
+            arm().zero_joint();
+        }
+    }
 };
 // ----------------------------------------------------------------------------
 // State: Hold
@@ -31,7 +38,10 @@ class Hold
     void entry() override {
         std::cout << "entry to hold" << std::endl;
         arm().hold_joint();
-    };
+    }
+    void react(Tick const &) override {
+        std::cout << "Tick" << std::endl;
+    }
 };
 // ----------------------------------------------------------------------------
 // State: Handle
@@ -42,7 +52,10 @@ class Handle
     void entry() override {
         std::cout << "entry to Handle" << std::endl;
         arm().handle_joint();
-    };
+    }
+    void react(Tick const &) override {
+        std::cout << "Tick" << std::endl;
+    }
 };
 // ----------------------------------------------------------------------------
 // State: Open
@@ -53,7 +66,10 @@ class Open
     void entry() override {
         std::cout << "entry to Open" << std::endl;
         arm().open_gripper();
-    };
+    }
+    void react(Tick const &) override {
+        std::cout << "Tick" << std::endl;
+    }
 };
 // ----------------------------------------------------------------------------
 // State: Close
@@ -64,17 +80,19 @@ class Close
     void entry() override {
         std::cout << "entry to Close" << std::endl;
         arm().close_gripper();
-    };
+    }
+    void react(Tick const &) override {
+        std::cout << "Tick" << std::endl;
+    }
 };
-
-
-
-
 
 void ArmFSM::react(MoveZero   const &)
 {
     std::cout << "Move2Zero" << std::endl;
-    transit<Zero>();
+    if (isPreviousStateReached_) {
+        transit<Zero>();
+    }
+
 }
 
 void ArmFSM::react(MoveHandle const &)
@@ -110,6 +128,7 @@ std::string ArmFSM::getCurrentStateName() {
     if (ArmFSM::template is_in_state<Close>())  return "Close";
     return "Unknown";
 }
+
 
 FSM_INITIAL_STATE(ArmFSM, Zero)
 

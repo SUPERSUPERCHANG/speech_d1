@@ -23,7 +23,7 @@ set(THIRD_PARTY_LIBS
 # ============ 库：arm_speech_control ============
 add_library(arm_speech_control STATIC)
 target_sources(arm_speech_control PRIVATE
-        src/arm_speech_control.cpp
+        src/arm_control/arm_speech_control.cpp
         src/msg/PubServoInfo_.cpp
         src/msg/ArmString_.cpp
 )
@@ -37,7 +37,7 @@ target_link_libraries(arm_speech_control
 # ============ 库：tcp_socket ============
 add_library(tcp_socket STATIC)
 target_sources(tcp_socket PRIVATE
-        src/tcp_socket.cpp
+        src/tcp/tcp_socket.cpp
 )
 target_include_directories(tcp_socket
         PUBLIC ${PROJECT_SOURCE_DIR}/include
@@ -46,7 +46,7 @@ target_include_directories(tcp_socket
 # ============ 库：arm_fsm ============
 add_library(arm_fsm STATIC)
 target_sources(arm_fsm PRIVATE
-        src/arm_fsm.cpp
+        src/fsm/arm_fsm.cpp
 )
 target_include_directories(arm_fsm
         PUBLIC ${PROJECT_SOURCE_DIR}/include ${THIRD_PARTY_INCLUDES}
@@ -54,22 +54,23 @@ target_include_directories(arm_fsm
 
 # ============ 可执行文件 ============
 # 1) 本地测试：仅用 arm_speech_control
-add_executable(local_arm_speech_control src/local_arm_speech_control.cpp)
+add_executable(local_arm_speech_control apps/local_arm_speech_control.cpp)
 target_link_libraries(local_arm_speech_control PRIVATE arm_speech_control)
 
 # 2) TCP 服务器
-add_executable(test_tcp_server src/test_tcp_server.cpp)
+add_executable(test_tcp_server apps/test_tcp_server.cpp)
 target_link_libraries(test_tcp_server PRIVATE tcp_socket )
 
 # 3) TCP 客户端
-add_executable(test_tcp_client src/test_tcp_client.cpp)
+add_executable(test_tcp_client apps/test_tcp_client.cpp)
 target_link_libraries(test_tcp_client PRIVATE tcp_socket)
 
 # 4) 综合：TCP + Arm（不再重复列 .cpp，只链接库）
-add_executable(tcp_arm_speech_control src/tcp_arm_speech_control.cpp)
+add_executable(tcp_arm_speech_control apps/tcp_arm_speech_control.cpp)
 target_link_libraries(tcp_arm_speech_control PRIVATE tcp_socket arm_speech_control)
 
 # 5) 综合：TCP + ArmFSM
-add_executable(demo_fsm src/demo_fsm.cpp)
+add_executable(demo_fsm apps/demo_fsm.cpp)
 target_link_libraries(demo_fsm PRIVATE tcp_socket arm_fsm arm_speech_control ${THIRD_PARTY_LIBS})
 target_include_directories(demo_fsm PRIVATE ${PROJECT_SOURCE_DIR}/include ${THIRD_PARTY_INCLUDES})
+

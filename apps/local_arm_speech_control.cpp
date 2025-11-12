@@ -2,7 +2,7 @@
 // Created by chang on 11/7/25.
 //
 
-#include "arm_speech_control.hpp"
+#include "../include/arm_control/arm_speech_control.hpp"
 
 int main(int argc, char* argv[])
 {

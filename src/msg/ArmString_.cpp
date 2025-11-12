@@ -6,7 +6,7 @@
   Cyclone DDS: v0.10.2
 
 *****************************************************************/
-#include "ArmString_.hpp"
+#include "../../include/msg/ArmString_.hpp"
 
 namespace org{
 namespace eclipse{

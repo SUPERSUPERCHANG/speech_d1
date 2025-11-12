@@ -1,13 +1,21 @@
 // src/main.cpp
-#include "arm_fsm.hpp"
-#include <arm_speech_control.hpp>
-#include "fsmlist.hpp"
-#include "tcp_socket.hpp"   // 你的 TcpSocket 声明
+#include "../include/fsm/arm_fsm.hpp"
+#include <../include/arm_control/arm_speech_control.hpp>
+#include "../include/fsm/fsmlist.hpp"
+#include "../include/tcp/tcp_socket.hpp"
 
 #include <iostream>
 #include <string>
 #include <cctype>
 #include <algorithm>
+#include <thread>
+#include <chrono>
+#include <mutex>
+#include <atomic>
+
+// set a lock for sendevent
+static std::mutex gFsmMutex;
+
 
 // ---- helpers: trim & lower (camelCase)
 static inline void lstrip(std::string &s) {
@@ -47,6 +55,18 @@ int main() {
 
     // 2) 启动 FSM（进入初始状态并执行 entry()）
     fsm_list::start();
+
+    std::atomic<bool> running{true};
+    const std::chrono::milliseconds tickPeriod(50);  // 每 50 ms 触发一次
+    std::thread tickThread([&](){
+        while (running.load(std::memory_order_relaxed)) {
+            {
+                std::lock_guard<std::mutex> lk(gFsmMutex);
+                send_event(Tick{});
+            }
+            std::this_thread::sleep_for(tickPeriod);
+        }
+    });
 
     std::cout << "===== Arm FSM + TCP =====\n"
               << "TCP端口: 9000\n"
@@ -99,6 +119,7 @@ int main() {
 
             switch (cmd) {
                 case 'z':
+                    //may need lock here
                     send_event(MoveZero{});
                     std::cout << "[FSM] sent MoveZero\n";
                     client.sendAll("ACK: MoveZero\n");
@@ -139,6 +160,13 @@ int main() {
             if (quitAll) break;
         } // per-client loop
     } // accept loop
+
+
+    // === exit tick thread ===
+    running = false;
+    if (tickThread.joinable())
+        tickThread.join();
+    // === finished ===
 
     std::cout << "Exit main.\n";
     return 0;
