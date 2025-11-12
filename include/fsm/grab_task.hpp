@@ -6,17 +6,25 @@
 #define D1_ARM_SPEECH_CONTROL_GRAB_TASK_HPP
 
 #include <string>
+#include <vector>
 #include <tinyfsm.hpp>
-
+#include <fsm/arm_fsm.hpp>
 
 // ----------------------------------------------------------------------------
 // Event declarations
 //
-struct GrabEvent       : tinyfsm::Event{ };
-
-struct ReleaseEvent       : tinyfsm::Event { };
 
 struct CancelEvent : tinyfsm::Event { };
+struct GrabEvent : tinyfsm::Event { };
+struct ReleaseEvent : tinyfsm::Event { };
+
+// ----------------------------------------------------------------------------
+// State declarations
+//
+class Reaching;
+class Releasing;
+class Idle;
+
 
 class ArmTaskFSM
 : public tinyfsm::Fsm<ArmTaskFSM>
@@ -32,15 +40,19 @@ public:
     /* default reaction for unhandled events */
     void react(tinyfsm::Event const &) { };
 
-    virtual void react(GrabEvent        const &);
-    virtual void react(ReleaseEvent        const &);
+    virtual void react(GrabEvent        const &) {};
+    virtual void react(ReleaseEvent        const &){};
+    virtual void react(CancelEvent        const &){};
+    virtual void react(Tick const &) {  } ;
 
     virtual void entry(void) { };  /* entry actions in some states */
     void         exit(void)  { };  /* no exit actions at all */
 
 protected:
-    static std::string current_state;
-    static std::string reaching_state_series;
+    inline static int current_state = 0;
+    inline static bool isReadyToNext = false;
+    inline static bool lastPrevReached = false;
+
 };
 
 

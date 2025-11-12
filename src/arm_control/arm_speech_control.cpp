@@ -42,7 +42,7 @@ void ArmSpeechControl::init()
 // ============================
 void ArmSpeechControl::open_gripper()
 {
-    unitree_arm::msg::dds_::ArmString_ msg{};
+    // unitree_arm::msg::dds_::ArmString_ msg{};
     // msg.data_() = "{\"seq\":4,\"address\":1,\"funcode\":1,\"data\":{\"id\":6,\"angle\":60,\"delay_ms\":0}}";
     // publisher_->Write(msg);
     //std::cout << "[ArmSpeechControl] Opening gripper..." << std::endl;
@@ -52,7 +52,7 @@ void ArmSpeechControl::open_gripper()
 
 void ArmSpeechControl::close_gripper()
 {
-	unitree_arm::msg::dds_::ArmString_ msg{};
+	// unitree_arm::msg::dds_::ArmString_ msg{};
     // msg.data_() = "{\"seq\":4,\"address\":1,\"funcode\":1,\"data\":{\"id\":6,\"angle\":15,\"delay_ms\":0}}";
     // publisher_->Write(msg);
     move_single(6,armTargets.at("close").angle6);
@@ -80,9 +80,11 @@ void ArmSpeechControl::hold_joint()
 void ArmSpeechControl::zero_joint()
 {
     //std::cout << "[ArmSpeechControl] Moving all joints to zero..." << std::endl;
-    unitree_arm::msg::dds_::ArmString_ msg{};
-    msg.data_() = "{\"seq\":4,\"address\":1,\"funcode\":7}";
-    publisher_->Write(msg);
+    // unitree_arm::msg::dds_::ArmString_ msg{};
+    // msg.data_() = "{\"seq\":4,\"address\":1,\"funcode\":7}";
+
+    move_all(armTargets.at("zero"));
+    //publisher_->Write(msg);
 }
 
 void ArmSpeechControl::move_single(int id, double angleDeg)
@@ -210,7 +212,7 @@ bool ArmSpeechControl::is_gripper_success(const ArmJointAngles& targetAnglesDeg,
         return std::abs(fbVal - tgtVal) <= tolDeg;
     };
     bool ok6 = within(feedback_angles_.angle6, targetAnglesDeg.angle6);
-    std::cout << "is gripper success:"<< ok6<<"fd:"<<feedback_angles_.angle6<<"\n";
+    std::cout << "is gripper success:"<< ok6<<" fd:"<<feedback_angles_.angle6<<"\n";
     bool allOk = ok6;
     // if (!allOk) {
     //     auto diff = [](double a, double b){ return a - b; };

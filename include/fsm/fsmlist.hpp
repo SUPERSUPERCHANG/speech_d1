@@ -7,8 +7,9 @@
 
 #include <tinyfsm.hpp>
 #include <fsm/arm_fsm.hpp>
+#include <fsm/grab_task.hpp>
 
-using fsm_list = tinyfsm::FsmList<ArmFSM>;
+using fsm_list = tinyfsm::FsmList<ArmFSM,ArmTaskFSM>;
 
 /** dispatch event to Arm */
 template<typename E>

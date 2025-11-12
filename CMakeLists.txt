@@ -54,6 +54,15 @@ target_include_directories(arm_fsm
         PUBLIC ${PROJECT_SOURCE_DIR}/include ${THIRD_PARTY_INCLUDES}
 )
 
+# ============ 库：grab_task ============
+add_library(grab_task STATIC)
+target_sources(grab_task PRIVATE
+        src/fsm/grab_task.cpp
+)
+target_include_directories(grab_task
+        PUBLIC ${PROJECT_SOURCE_DIR}/include ${THIRD_PARTY_INCLUDES}
+)
+
 # ============ 可执行文件 ============
 # 1) 本地测试：仅用 arm_speech_control
 add_executable(local_arm_speech_control apps/local_arm_speech_control.cpp)
@@ -73,6 +82,6 @@ target_link_libraries(tcp_arm_speech_control PRIVATE tcp_socket arm_speech_contr
 
 # 5) 综合：TCP + ArmFSM
 add_executable(demo_fsm apps/demo_fsm.cpp)
-target_link_libraries(demo_fsm PRIVATE tcp_socket arm_fsm arm_speech_control ${THIRD_PARTY_LIBS})
+target_link_libraries(demo_fsm PRIVATE tcp_socket grab_task arm_fsm arm_speech_control ${THIRD_PARTY_LIBS})
 target_include_directories(demo_fsm PRIVATE ${PROJECT_SOURCE_DIR}/include ${THIRD_PARTY_INCLUDES})
 

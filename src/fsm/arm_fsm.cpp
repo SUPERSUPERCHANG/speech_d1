@@ -114,7 +114,6 @@ class Close
         else {
             isPreviousStateReached_=false;
             arm().close_gripper();
-            isPreviousStateReached_=true;
         }
      }
 };

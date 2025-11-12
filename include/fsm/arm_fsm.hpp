@@ -59,10 +59,8 @@ public:
     static std::string getCurrentStateName();
 
     static void attachController(ArmSpeechControl& ctrl) { ctrl_ = &ctrl; }
-
-protected:
     inline static bool isPreviousStateReached_ = false;
-    inline static std::string prevStateName_ = "";
+protected:
 
     static ArmSpeechControl& arm() {
         assert(ctrl_ && "Arm controller not attached. Call Arm::attachController() first.");

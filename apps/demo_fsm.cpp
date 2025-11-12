@@ -1,8 +1,11 @@
 // src/main.cpp
 #include "../include/fsm/arm_fsm.hpp"
+#include "../include/fsm/grab_task.hpp"
 #include <../include/arm_control/arm_speech_control.hpp>
 #include "../include/fsm/fsmlist.hpp"
 #include "../include/tcp/tcp_socket.hpp"
+#include <../3rdparty/include/tinyfsm.hpp>
+
 
 #include <iostream>
 #include <string>
@@ -56,6 +59,7 @@ static inline char parseCommand(const std::string& raw)
     if (s == "o" || s == "open" || s == "moveopen" || s == "move_open") return 'o';
     if (s == "c" || s == "close" || s == "moveclose" || s == "move_close") return 'c';
     if (s == "w" || s == "state" || s == "where" || s == "whoami") return 'w';
+    if (s == "g" || s == "grab" || s == "grasp") return 'g';
     if (s == "q" || s == "quit" || s == "exit") return 'q';
     return '\0';
 }
@@ -171,6 +175,13 @@ int main()
                     std::string stateName = ArmFSM::getCurrentStateName();
                     std::cout << "[FSM] Current state: " << stateName << "\n";
                     client.sendAll(std::string("STATE: ") + stateName + "\n");
+                    break;
+                }
+            case 'g':
+                {
+                    std::cout << "[FSM] sending Grab\n";
+                    send_event(GrabEvent{});
+                    client.sendAll("ACK: Grab\n");
                     break;
                 }
             case 'q':
