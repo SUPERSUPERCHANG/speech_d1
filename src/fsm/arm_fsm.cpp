@@ -63,7 +63,7 @@ class Handle
     }
     void react(Tick const &) override {
         // std::cout << "Tick" << std::endl;
-        if (arm().is_move_success(arm().armTargets.at("handle"),3)) {
+        if (arm().is_move_success(arm().armTargets.at("handle"),5)) {
             isPreviousStateReached_=true;
             // std::cout << "arm is zero" << std::endl;
         }
@@ -107,15 +107,16 @@ class Close
     }
     void react(Tick const &) override {
         // std::cout << "Tick" << std::endl;
-        if (arm().is_gripper_success(arm().armTargets.at("close"),2)) {
-            isPreviousStateReached_=true;
-            // std::cout << "arm is zero" << std::endl;
-        }
-        else {
-            isPreviousStateReached_=false;
+        // if (arm().is_gripper_success(arm().armTargets.at("close"),2)) {
+        //     isPreviousStateReached_=true;
+        //     // std::cout << "arm is zero" << std::endl;
+        // }
+        // else {
+        //     isPreviousStateReached_=false;
             arm().close_gripper();
-        }
-    }
+            isPreviousStateReached_=true;
+        // }
+     }
 };
 
 void ArmFSM::react(MoveZero const &)

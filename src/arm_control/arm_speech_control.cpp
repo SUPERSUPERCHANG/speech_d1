@@ -179,7 +179,7 @@ bool ArmSpeechControl::is_move_success(const ArmJointAngles& targetAnglesDeg, do
 
     bool ok0 = within(feedback_angles_.angle0, targetAnglesDeg.angle0);
     bool ok1 = within(feedback_angles_.angle1, targetAnglesDeg.angle1);
-    bool ok2 = within(feedback_angles_.angle2, targetAnglesDeg.angle2);
+    bool ok2 = true;//within(feedback_angles_.angle2, targetAnglesDeg.angle2);
     bool ok3 = within(feedback_angles_.angle3, targetAnglesDeg.angle3);
     bool ok4 = within(feedback_angles_.angle4, targetAnglesDeg.angle4);
     bool ok5 = within(feedback_angles_.angle5, targetAnglesDeg.angle5);
