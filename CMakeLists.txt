@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(THIRD_PARTY_INCLUDES
         /usr/local/include/ddscxx
         /usr/local/include/iceoryx/v2.0.2
+        ${PROJECT_SOURCE_DIR}/3rdparty/include
         ${PROJECT_SOURCE_DIR}/include
 )
 

@@ -9,7 +9,7 @@
 #include <string>
 #include <unitree/robot/channel/channel_publisher.hpp>
 #include <unitree/robot/channel/channel_subscriber.hpp>
-#include <../PubServoInfo_.hpp>
+#include <msg/PubServoInfo_.hpp>
 #include <unitree/common/time/time_tool.hpp>
 #include "../msg/ArmString_.hpp"
 
@@ -50,7 +50,7 @@ public:
     void process_command(const std::string& command);
     void angle_handler(const void* msg);
     bool is_move_success(const ArmJointAngles& targetAnglesDeg, double tolDeg);
-
+    bool is_gripper_success(const ArmJointAngles& targetAnglesDeg, double tolDeg);
     ArmJointAngles feedback_angles_;
     std::unordered_map<std::string, int> nameToIndex_;
 
@@ -58,6 +58,8 @@ public:
         {"handle", {0.0, 20.0, -30.0, 0.0, -30.0, 0.0, 0.0}},
         {"hold",   {0.0, -90.0, 90.0, 0.0,  0.0,  0.0, 0.0}},
         {"zero",   {0.0, 0.0,   0.0,  0.0,  0.0,  0.0, 0.0}},
+        {"open",   {0.0, 0.0,   0.0,  0.0,  0.0,  0.0, 49.5}},
+        {"close",   {0.0, 0.0,   0.0,  0.0,  0.0,  0.0, 15.0}}
     };
 private:
 

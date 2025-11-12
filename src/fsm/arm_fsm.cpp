@@ -17,14 +17,14 @@ class Zero
         arm().zero_joint();
     }
     void react(Tick const &) override {
-        std::cout << "Tick" << std::endl;
+        // std::cout << "Tick" << std::endl;
         if (arm().is_move_success(arm().armTargets.at("zero"),3)) {
             isPreviousStateReached_=true;
-            std::cout << "arm is zero" << std::endl;
+            // std::cout << "arm is zero" << std::endl;
         }
         else {
             isPreviousStateReached_=false;
-            std::cout << "arm is not zero, resend the cmd" << std::endl;
+            // std::cout << "arm is not zero, resend the cmd" << std::endl;
             arm().zero_joint();
         }
     }
@@ -40,7 +40,15 @@ class Hold
         arm().hold_joint();
     }
     void react(Tick const &) override {
-        std::cout << "Tick" << std::endl;
+        // std::cout << "Tick" << std::endl;
+        if (arm().is_move_success(arm().armTargets.at("hold"),3)) {
+            isPreviousStateReached_=true;
+            // std::cout << "arm is zero" << std::endl;
+        }
+        else {
+            isPreviousStateReached_=false;
+            arm().hold_joint();
+        }
     }
 };
 // ----------------------------------------------------------------------------
@@ -54,7 +62,15 @@ class Handle
         arm().handle_joint();
     }
     void react(Tick const &) override {
-        std::cout << "Tick" << std::endl;
+        // std::cout << "Tick" << std::endl;
+        if (arm().is_move_success(arm().armTargets.at("handle"),3)) {
+            isPreviousStateReached_=true;
+            // std::cout << "arm is zero" << std::endl;
+        }
+        else {
+            isPreviousStateReached_=false;
+            arm().handle_joint();
+        }
     }
 };
 // ----------------------------------------------------------------------------
@@ -68,7 +84,15 @@ class Open
         arm().open_gripper();
     }
     void react(Tick const &) override {
-        std::cout << "Tick" << std::endl;
+        // std::cout << "Tick" << std::endl;
+        if (arm().is_gripper_success(arm().armTargets.at("open"),2)) {
+            isPreviousStateReached_=true;
+            // std::cout << "arm is zero" << std::endl;
+        }
+        else {
+            isPreviousStateReached_=false;
+            arm().open_gripper();
+        }
     }
 };
 // ----------------------------------------------------------------------------
@@ -82,42 +106,83 @@ class Close
         arm().close_gripper();
     }
     void react(Tick const &) override {
-        std::cout << "Tick" << std::endl;
+        // std::cout << "Tick" << std::endl;
+        if (arm().is_gripper_success(arm().armTargets.at("close"),2)) {
+            isPreviousStateReached_=true;
+            // std::cout << "arm is zero" << std::endl;
+        }
+        else {
+            isPreviousStateReached_=false;
+            arm().close_gripper();
+        }
     }
 };
 
-void ArmFSM::react(MoveZero   const &)
+void ArmFSM::react(MoveZero const &)
 {
-    std::cout << "Move2Zero" << std::endl;
-    if (isPreviousStateReached_) {
+    if (isPreviousStateReached_)
+    {
+        std::cout << "Move2Zero" << std::endl;
         transit<Zero>();
     }
-
+    else
+    {
+        std::cout << "Move2Zero failed" << std::endl;
+    }
 }
 
 void ArmFSM::react(MoveHandle const &)
 {
-    std::cout << "Move2Handle" << std::endl;
-    transit<Handle>();
+    if (isPreviousStateReached_)
+    {
+        std::cout << "Move2Handle" << std::endl;
+        transit<Handle>();
+    }
+    else
+    {
+        std::cout << "Move2Handle failed" << std::endl;
+    }
 }
 
 void ArmFSM::react(MoveHold const &)
 {
-    std::cout << "Move2Hold" << std::endl;
-    transit<Hold>();
+    if (isPreviousStateReached_)
+    {
+        std::cout << "Move2Hold" << std::endl;
+        transit<Hold>();
+    }
+    else
+    {
+        std::cout << "Move2Hold failed" << std::endl;
+    }
 }
 
 void ArmFSM::react(MoveOpen const &)
 {
-    std::cout << "Move2Open" << std::endl;
-    transit<Open>();
+    if (isPreviousStateReached_)
+    {
+        std::cout << "Move2Open" << std::endl;
+        transit<Open>();
+    }
+    else
+    {
+        std::cout << "Move2Open failed" << std::endl;
+    }
 }
 
 void ArmFSM::react(MoveClose const &)
 {
-    std::cout << "Move2Close" << std::endl;
-    transit<Close>();
+    if (isPreviousStateReached_)
+    {
+        std::cout << "Move2Close" << std::endl;
+        transit<Close>();
+    }
+    else
+    {
+        std::cout << "Move2Close failed" << std::endl;
+    }
 }
+
 
 
 std::string ArmFSM::getCurrentStateName() {

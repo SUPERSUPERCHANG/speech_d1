@@ -43,18 +43,21 @@ void ArmSpeechControl::init()
 void ArmSpeechControl::open_gripper()
 {
     unitree_arm::msg::dds_::ArmString_ msg{};
-    msg.data_() = "{\"seq\":4,\"address\":1,\"funcode\":1,\"data\":{\"id\":6,\"angle\":55,\"delay_ms\":0}}";
-    publisher_->Write(msg);
-    std::cout << "[ArmSpeechControl] Opening gripper..." << std::endl;
+    // msg.data_() = "{\"seq\":4,\"address\":1,\"funcode\":1,\"data\":{\"id\":6,\"angle\":60,\"delay_ms\":0}}";
+    // publisher_->Write(msg);
+    //std::cout << "[ArmSpeechControl] Opening gripper..." << std::endl;
+    move_single(6,armTargets.at("open").angle6);
+
 }
 
 void ArmSpeechControl::close_gripper()
 {
 	unitree_arm::msg::dds_::ArmString_ msg{};
-    msg.data_() = "{\"seq\":4,\"address\":1,\"funcode\":1,\"data\":{\"id\":6,\"angle\":15,\"delay_ms\":0}}";
-    publisher_->Write(msg);
+    // msg.data_() = "{\"seq\":4,\"address\":1,\"funcode\":1,\"data\":{\"id\":6,\"angle\":15,\"delay_ms\":0}}";
+    // publisher_->Write(msg);
+    move_single(6,armTargets.at("close").angle6);
 
-    std::cout << "[ArmSpeechControl] Closing gripper..." << std::endl;
+    //std::cout << "[ArmSpeechControl] Closing gripper..." << std::endl;
 }
 
 // ============================
@@ -62,21 +65,21 @@ void ArmSpeechControl::close_gripper()
 // ============================
 void ArmSpeechControl::handle_joint()
 {
-    std::cout << "[ArmSpeechControl] Handling joint..." << std::endl;
+    //std::cout << "[ArmSpeechControl] Handling joint..." << std::endl;
     // {0, 20, -30, 0, -30, 0, 0}
     move_all(armTargets.at("handle"));
 }
 
 void ArmSpeechControl::hold_joint()
 {
-    std::cout << "[ArmSpeechControl] Holding joint position..." << std::endl;
+    //std::cout << "[ArmSpeechControl] Holding joint position..." << std::endl;
     // {0, -90, 90, 0, 0, 0, 0}
     move_all(armTargets.at("hold"));
 }
 
 void ArmSpeechControl::zero_joint()
 {
-    std::cout << "[ArmSpeechControl] Moving all joints to zero..." << std::endl;
+    //std::cout << "[ArmSpeechControl] Moving all joints to zero..." << std::endl;
     unitree_arm::msg::dds_::ArmString_ msg{};
     msg.data_() = "{\"seq\":4,\"address\":1,\"funcode\":7}";
     publisher_->Write(msg);
@@ -101,8 +104,8 @@ if (!publisher_) {
 
     publisher_->Write(msg);
 
-    std::cout << "[ArmSpeechControl] Moving single joint id=" 
-              << id << " to angle=" << angleDeg << " deg" << std::endl;
+    // std::cout << "[ArmSpeechControl] Moving single joint id="
+              // << id << " to angle=" << angleDeg << " deg" << std::endl;
 
 }
 
@@ -180,23 +183,41 @@ bool ArmSpeechControl::is_move_success(const ArmJointAngles& targetAnglesDeg, do
     bool ok3 = within(feedback_angles_.angle3, targetAnglesDeg.angle3);
     bool ok4 = within(feedback_angles_.angle4, targetAnglesDeg.angle4);
     bool ok5 = within(feedback_angles_.angle5, targetAnglesDeg.angle5);
+    // bool ok6 = within(feedback_angles_.angle6, targetAnglesDeg.angle6);
+
+    bool allOk = ok0 && ok1 && ok2 && ok3 && ok4 && ok5;// && ok6;
+
+    // if (!allOk) {
+    //     auto diff = [](double a, double b){ return a - b; };
+    //     std::cout << std::fixed << std::setprecision(2)
+    //               << "[ArmSpeechControl] reach check (tol=" << tolDeg << "°):\n"
+    //               << "  j0 fb=" << feedback_angles_.angle0 << " tgt=" << targetAnglesDeg.angle0 << " diff=" << diff(feedback_angles_.angle0, targetAnglesDeg.angle0) << " -> " << (ok0?"OK":"NG") << "\n"
+    //               << "  j1 fb=" << feedback_angles_.angle1 << " tgt=" << targetAnglesDeg.angle1 << " diff=" << diff(feedback_angles_.angle1, targetAnglesDeg.angle1) << " -> " << (ok1?"OK":"NG") << "\n"
+    //               << "  j2 fb=" << feedback_angles_.angle2 << " tgt=" << targetAnglesDeg.angle2 << " diff=" << diff(feedback_angles_.angle2, targetAnglesDeg.angle2) << " -> " << (ok2?"OK":"NG") << "\n"
+    //               << "  j3 fb=" << feedback_angles_.angle3 << " tgt=" << targetAnglesDeg.angle3 << " diff=" << diff(feedback_angles_.angle3, targetAnglesDeg.angle3) << " -> " << (ok3?"OK":"NG") << "\n"
+    //               << "  j4 fb=" << feedback_angles_.angle4 << " tgt=" << targetAnglesDeg.angle4 << " diff=" << diff(feedback_angles_.angle4, targetAnglesDeg.angle4) << " -> " << (ok4?"OK":"NG") << "\n"
+    //               << "  j5 fb=" << feedback_angles_.angle5 << " tgt=" << targetAnglesDeg.angle5 << " diff=" << diff(feedback_angles_.angle5, targetAnglesDeg.angle5) << " -> " << (ok5?"OK":"NG") << "\n"
+    //               << "  j6 fb=" << feedback_angles_.angle6 << " tgt=" << targetAnglesDeg.angle6 << " diff=" << diff(feedback_angles_.angle6, targetAnglesDeg.angle6) << " -> " << (ok6?"OK":"NG") << "\n";
+    // }
+
+    return allOk;
+}
+
+bool ArmSpeechControl::is_gripper_success(const ArmJointAngles& targetAnglesDeg, double tolDeg)
+{
+
+    auto within = [&](double fbVal, double tgtVal) {
+        return std::abs(fbVal - tgtVal) <= tolDeg;
+    };
     bool ok6 = within(feedback_angles_.angle6, targetAnglesDeg.angle6);
-
-    bool allOk = ok0 && ok1 && ok2 && ok3 && ok4 && ok5 && ok6;
-
-    if (!allOk) {
-        auto diff = [](double a, double b){ return a - b; };
-        std::cout << std::fixed << std::setprecision(2)
-                  << "[ArmSpeechControl] reach check (tol=" << tolDeg << "°):\n"
-                  << "  j0 fb=" << feedback_angles_.angle0 << " tgt=" << targetAnglesDeg.angle0 << " diff=" << diff(feedback_angles_.angle0, targetAnglesDeg.angle0) << " -> " << (ok0?"OK":"NG") << "\n"
-                  << "  j1 fb=" << feedback_angles_.angle1 << " tgt=" << targetAnglesDeg.angle1 << " diff=" << diff(feedback_angles_.angle1, targetAnglesDeg.angle1) << " -> " << (ok1?"OK":"NG") << "\n"
-                  << "  j2 fb=" << feedback_angles_.angle2 << " tgt=" << targetAnglesDeg.angle2 << " diff=" << diff(feedback_angles_.angle2, targetAnglesDeg.angle2) << " -> " << (ok2?"OK":"NG") << "\n"
-                  << "  j3 fb=" << feedback_angles_.angle3 << " tgt=" << targetAnglesDeg.angle3 << " diff=" << diff(feedback_angles_.angle3, targetAnglesDeg.angle3) << " -> " << (ok3?"OK":"NG") << "\n"
-                  << "  j4 fb=" << feedback_angles_.angle4 << " tgt=" << targetAnglesDeg.angle4 << " diff=" << diff(feedback_angles_.angle4, targetAnglesDeg.angle4) << " -> " << (ok4?"OK":"NG") << "\n"
-                  << "  j5 fb=" << feedback_angles_.angle5 << " tgt=" << targetAnglesDeg.angle5 << " diff=" << diff(feedback_angles_.angle5, targetAnglesDeg.angle5) << " -> " << (ok5?"OK":"NG") << "\n"
-                  << "  j6 fb=" << feedback_angles_.angle6 << " tgt=" << targetAnglesDeg.angle6 << " diff=" << diff(feedback_angles_.angle6, targetAnglesDeg.angle6) << " -> " << (ok6?"OK":"NG") << "\n";
-    }
-
+    std::cout << "is gripper success:"<< ok6<<"fd:"<<feedback_angles_.angle6<<"\n";
+    bool allOk = ok6;
+    // if (!allOk) {
+    //     auto diff = [](double a, double b){ return a - b; };
+    //     std::cout << std::fixed << std::setprecision(2)
+    //               << "[ArmSpeechControl] reach check (tol=" << tolDeg << "°):\n"
+    //               << "  j6 fb=" << feedback_angles_.angle6 << " tgt=" << targetAnglesDeg.angle6 << " diff=" << diff(feedback_angles_.angle6, targetAnglesDeg.angle6) << " -> " << (ok6?"OK":"NG") << "\n";
+    // }
     return allOk;
 }
 
