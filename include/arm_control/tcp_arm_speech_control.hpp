@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <string>
-#include <../tcp/tcp_socket.hpp>
+#include <tcp_socket.hpp>
 #include "arm_speech_control.hpp"
 
 #endif //SPEECH_D1_TCP_ARM_SPEECH_CONTROL_HPP

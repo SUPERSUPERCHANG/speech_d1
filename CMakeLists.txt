@@ -11,6 +11,7 @@ set(THIRD_PARTY_INCLUDES
         /usr/local/include/iceoryx/v2.0.2
         ${PROJECT_SOURCE_DIR}/3rdparty/include
         ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/include/tcp
 )
 
 set(THIRD_PARTY_LIBS
@@ -41,7 +42,7 @@ target_sources(tcp_socket PRIVATE
         src/tcp/tcp_socket.cpp
 )
 target_include_directories(tcp_socket
-        PUBLIC ${PROJECT_SOURCE_DIR}/include
+        PUBLIC ${PROJECT_SOURCE_DIR}/include ${THIRD_PARTY_INCLUDES}
 )
 
 # ============ 库：arm_fsm ============
