@@ -212,7 +212,7 @@ bool ArmSpeechControl::is_gripper_success(const ArmJointAngles& targetAnglesDeg,
         return std::abs(fbVal - tgtVal) <= tolDeg;
     };
     bool ok6 = within(feedback_angles_.angle6, targetAnglesDeg.angle6);
-    std::cout << "is gripper success:"<< ok6<<" fd:"<<feedback_angles_.angle6<<"\n";
+    // std::cout << "is gripper success:"<< ok6<<" fd:"<<feedback_angles_.angle6<<"\n";
     bool allOk = ok6;
     // if (!allOk) {
     //     auto diff = [](double a, double b){ return a - b; };

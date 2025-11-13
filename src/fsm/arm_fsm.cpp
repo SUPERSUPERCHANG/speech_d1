@@ -106,7 +106,7 @@ class Close
         arm().close_gripper();
     }
     void react(Tick const &) override {
-        std::cout << "Tick" << std::endl;
+        // std::cout << "Tick" << std::endl;
         if (arm().is_gripper_success(arm().armTargets.at("close"),2)) {
             isPreviousStateReached_=true;
             // std::cout << "arm is zero" << std::endl;
@@ -117,6 +117,27 @@ class Close
         }
      }
 };
+
+class Release
+: public ArmFSM
+{
+    void entry() override {
+        std::cout << "entry to Release" << std::endl;
+        arm().handle_joint();
+    }
+    void react(Tick const &) override {
+        // std::cout << "Tick" << std::endl;
+        if (arm().is_move_success(arm().armTargets.at("Release"),5)) {
+            isPreviousStateReached_=true;
+            // std::cout << "arm is zero" << std::endl;
+        }
+        else {
+            isPreviousStateReached_=false;
+            arm().handle_joint();
+        }
+    }
+};
+
 
 void ArmFSM::react(MoveZero const &)
 {
@@ -180,6 +201,19 @@ void ArmFSM::react(MoveClose const &)
     else
     {
         std::cout << "Move2Close failed" << std::endl;
+    }
+}
+
+void ArmFSM::react(MoveRelease const &)
+{
+    if (isPreviousStateReached_)
+    {
+        std::cout << "Move2Release" << std::endl;
+        transit<Release>();
+    }
+    else
+    {
+        std::cout << "Move2Release failed" << std::endl;
     }
 }
 

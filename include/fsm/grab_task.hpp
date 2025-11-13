@@ -46,7 +46,7 @@ public:
     virtual void react(Tick const &) {  } ;
 
     virtual void entry(void) { };  /* entry actions in some states */
-    void         exit(void)  { };  /* no exit actions at all */
+    virtual void exit(void)  { };  /* no exit actions at all */
 
 protected:
     inline static int current_state = 0;

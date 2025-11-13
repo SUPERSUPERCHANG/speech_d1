@@ -20,6 +20,7 @@ struct MoveHold : tinyfsm::Event { };
 struct MoveOpen : tinyfsm::Event {};
 struct MoveClose  : tinyfsm::Event {};
 struct Tick : tinyfsm::Event {};
+struct MoveRelease : tinyfsm::Event {};
 
 // ---------- States ---------- //
 class Zero;
@@ -49,6 +50,7 @@ public:
     void react(MoveHold const &);
     void react(MoveOpen const &);
     void react(MoveClose const &);
+    void react(MoveRelease const &);
 
     virtual void react(Tick const &)=0;
 

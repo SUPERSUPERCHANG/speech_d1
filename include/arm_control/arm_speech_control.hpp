@@ -13,6 +13,9 @@
 #include <unitree/common/time/time_tool.hpp>
 #include "../msg/ArmString_.hpp"
 
+#define GRIPPER_OPEN_ANGLE 49.5
+#define GRIPPER_CLOSE_ANGLE 25.0
+
 using namespace unitree::robot;
 using namespace unitree::common;
 
@@ -55,11 +58,12 @@ public:
     std::unordered_map<std::string, int> nameToIndex_;
 
     inline static const std::unordered_map<std::string, ArmJointAngles> armTargets = {
-        {"handle", {0.0, 30.0, -30.0, 0.0, -35.0, 0.0, 49.5}},
-        {"hold",   {0.0, -90.0, 90.0, 0.0,  0.0,  0.0, 25.0}},
-        {"zero",   {0.0, 0.0,   0.0,  0.0,  0.0,  0.0, 25.0}},
-        {"open",   {0.0, 0.0,   0.0,  0.0,  0.0,  0.0, 49.5}},
-        {"close",   {0.0, 0.0,   0.0,  0.0,  0.0,  0.0, 25.0}}
+        {"handle", {0.0, 30.0, -30.0, 0.0, -35.0, 0.0, GRIPPER_OPEN_ANGLE}},
+        {"hold",   {0.0, -90.0, 90.0, 0.0,  0.0,  0.0, GRIPPER_CLOSE_ANGLE}},
+        {"zero",   {0.0, 0.0,   0.0,  0.0,  0.0,  0.0, GRIPPER_CLOSE_ANGLE}},
+        {"open",   {0.0, 0.0,   0.0,  0.0,  0.0,  0.0, GRIPPER_OPEN_ANGLE}},
+        {"close",   {0.0, 0.0,   0.0,  0.0,  0.0,  0.0, GRIPPER_CLOSE_ANGLE}},
+        {"release",{0.0, 30.0, -30.0, 0.0, -35.0, 0.0, GRIPPER_CLOSE_ANGLE}}
     };
 private:
 

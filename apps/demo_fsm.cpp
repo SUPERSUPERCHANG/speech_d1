@@ -60,38 +60,49 @@ static inline char parseCommand(const std::string& raw)
     if (s == "c" || s == "close" || s == "moveclose" || s == "move_close") return 'c';
     if (s == "w" || s == "state" || s == "where" || s == "whoami") return 'w';
     if (s == "g" || s == "grab" || s == "grasp") return 'g';
+    if (s=="r"||s=="release"||s=="release_gripper") return 'r';
     if (s == "q" || s == "quit" || s == "exit") return 'q';
     return '\0';
 }
 
 int main()
 {
-    // 1) 控制器注入到 FSM
+    // === 1) Initialize and attach the controller ===
     ArmSpeechControl controller;
-    ArmFSM::attachController(controller); // ★ 注入控制器
+    ArmFSM::attachController(controller);  // Inject controller into FSM
 
-    // 2) 启动 FSM（进入初始状态并执行 entry()）
-    fsm_list::start();
+    // === 2) Start all FSMs ===
+    fsm_list::start();  // Enter initial state and trigger entry()
 
+    // === 3) Start periodic Tick thread ===
     std::atomic<bool> running{true};
-    const std::chrono::milliseconds tickPeriod(100); // 每 50 ms 触发一次
+    const std::chrono::milliseconds tickPeriod(100); // Trigger a Tick every 100 ms
     std::thread tickThread([&]()
     {
         while (running.load(std::memory_order_relaxed))
         {
             {
-                std::lock_guard<std::mutex> lk(gFsmMutex);
-                send_event(Tick{});
+                std::lock_guard<std::mutex> lk(gFsmMutex);  // Protect send_event from concurrent access
+                send_event(Tick{});                         // Periodic Tick signal
             }
             std::this_thread::sleep_for(tickPeriod);
         }
     });
 
+    // === 4) Start TCP server ===
     std::cout << "===== Arm FSM + TCP =====\n"
-        << "TCP端口: 9000\n"
-        << "命令: z/zero, h/hold, n/handle, o/open, c/close, w/state, q/quit\n";
+              << "TCP port: 9000\n"
+              << "Available commands:\n"
+              << " z / zero       - MoveZero\n"
+              << " h / hold       - MoveHold\n"
+              << " n / handle     - MoveHandle\n"
+              << " o / open       - MoveOpen\n"
+              << " c / close      - MoveClose\n"
+              << " g / grab       - Execute grab task sequence\n"
+              << " r / release    - Execute release task sequence\n"
+              << " w / state      - Query current state\n"
+              << " q / quit       - Quit program\n\n";
 
-    // 3) 在主函数里直接开 TCP server（单线程）
     TcpSocket server;
     const uint16_t port = 9000;
     if (!server.bindAndListen(port))
@@ -103,6 +114,7 @@ int main()
 
     bool quitAll = false;
 
+    // === 5) Accept client connections ===
     while (!quitAll)
     {
         std::string clientIp;
@@ -111,15 +123,15 @@ int main()
         TcpSocket client = server.accept(&clientIp, &clientPort);
         if (!client.valid())
         {
-            std::cerr << "[TCP] accept() failed, continue...\n";
+            std::cerr << "[TCP] accept() failed, waiting for new connections...\n";
             continue;
         }
 
         std::cout << "[TCP] Accepted " << clientIp << ":" << clientPort << "\n";
         client.sendAll("Welcome to the Arm FSM Server!\n"
-            "Commands: z h n o c w q\n");
+                       "Commands: z h n o c g r w q\n");
 
-        // 简单收发循环：收到就转成事件
+        // === 6) Per-client command loop ===
         char buffer[1024];
         while (true)
         {
@@ -127,7 +139,7 @@ int main()
             if (bytes <= 0)
             {
                 std::cout << "[TCP] Client disconnected: "
-                    << clientIp << ":" << clientPort << "\n";
+                          << clientIp << ":" << clientPort << "\n";
                 break;
             }
 
@@ -142,65 +154,67 @@ int main()
                 continue;
             }
 
+            // === 7) Dispatch command as FSM event ===
             switch (cmd)
             {
-            case 'z':
-                //may need lock here
-                std::cout << "[FSM] sending MoveZero\n";
-                send_event(MoveZero{});
-                client.sendAll("ACK: MoveZero\n");
-                break;
-            case 'h':
-                std::cout << "[FSM] sending MoveHold\n";
-                send_event(MoveHold{});
-                client.sendAll("ACK: MoveHold\n");
-                break;
-            case 'n':
-                std::cout << "[FSM] sending MoveHandle\n";
-                send_event(MoveHandle{});
-                client.sendAll("ACK: MoveHandle\n");
-                break;
-            case 'o':
-                std::cout << "[FSM] sending MoveOpen\n";
-                send_event(MoveOpen{});
-                client.sendAll("ACK: MoveOpen\n");
-                break;
-            case 'c':
-                std::cout << "[FSM] sending MoveClose\n";
-                send_event(MoveClose{});
-                client.sendAll("ACK: MoveClose\n");
-                break;
-            case 'w':
-                {
+                case 'z':
+                    std::cout << "[FSM] → MoveZero\n";
+                    send_event(MoveZero{});
+                    client.sendAll("ACK: MoveZero\n");
+                    break;
+                case 'h':
+                    std::cout << "[FSM] → MoveHold\n";
+                    send_event(MoveHold{});
+                    client.sendAll("ACK: MoveHold\n");
+                    break;
+                case 'n':
+                    std::cout << "[FSM] → MoveHandle\n";
+                    send_event(MoveHandle{});
+                    client.sendAll("ACK: MoveHandle\n");
+                    break;
+                case 'o':
+                    std::cout << "[FSM] → MoveOpen\n";
+                    send_event(MoveOpen{});
+                    client.sendAll("ACK: MoveOpen\n");
+                    break;
+                case 'c':
+                    std::cout << "[FSM] → MoveClose\n";
+                    send_event(MoveClose{});
+                    client.sendAll("ACK: MoveClose\n");
+                    break;
+                case 'g':
+                    std::cout << "[FSM] → Grab (task FSM)\n";
+                    send_event(GrabEvent{});
+                    client.sendAll("ACK: Grab\n");
+                    break;
+                case 'r':
+                    std::cout << "[FSM] → Release (task FSM)\n";
+                    send_event(ReleaseEvent{});
+                    client.sendAll("ACK: Release\n");
+                    break;
+                case 'w': {
                     std::string stateName = ArmFSM::getCurrentStateName();
                     std::cout << "[FSM] Current state: " << stateName << "\n";
                     client.sendAll(std::string("STATE: ") + stateName + "\n");
                     break;
                 }
-            case 'g':
-                {
-                    std::cout << "[FSM] sending Grab\n";
-                    send_event(GrabEvent{});
-                    client.sendAll("ACK: Grab\n");
+                case 'q':
+                    std::cout << "[FSM] Quit by client.\n";
+                    client.sendAll("ACK: Quit\n");
+                    quitAll = true;
                     break;
-                }
-            case 'q':
-                std::cout << "[FSM] Quit by client.\n";
-                client.sendAll("ACK: Quit\n");
-                quitAll = true; // 退出整个程序
-                break;
             }
 
             if (quitAll) break;
-        } // per-client loop
-    } // accept loop
+        } // end per-client loop
+    } // end accept loop
 
-    // === exit tick thread ===
+    // === 8) Stop Tick thread ===
     running = false;
     if (tickThread.joinable())
         tickThread.join();
-    // === finished ===
 
     std::cout << "Exit main.\n";
     return 0;
 }
+
