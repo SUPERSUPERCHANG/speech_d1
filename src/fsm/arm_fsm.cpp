@@ -127,7 +127,7 @@ class Release
     }
     void react(Tick const &) override {
         // std::cout << "Tick" << std::endl;
-        if (arm().is_move_success(arm().armTargets.at("Release"),5)) {
+        if (arm().is_move_success(arm().armTargets.at("release"),5)) {
             isPreviousStateReached_=true;
             // std::cout << "arm is zero" << std::endl;
         }

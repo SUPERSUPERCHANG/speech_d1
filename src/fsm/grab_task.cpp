@@ -153,6 +153,8 @@ class Idle:public ArmTaskFSM
     void exit() override
     {
         current_state = 0;
+        isReadyToNext = false;
+        lastPrevReached = false;
     }
 }; // forward declaration
 
