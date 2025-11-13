@@ -76,7 +76,7 @@ int main()
 
     // === 3) Start periodic Tick thread ===
     std::atomic<bool> running{true};
-    const std::chrono::milliseconds tickPeriod(100); // Trigger a Tick every 100 ms
+    const std::chrono::milliseconds tickPeriod(50); // Trigger a Tick every 100 ms
     std::thread tickThread([&]()
     {
         while (running.load(std::memory_order_relaxed))

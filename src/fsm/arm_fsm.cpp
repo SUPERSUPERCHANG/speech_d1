@@ -123,7 +123,7 @@ class Release
 {
     void entry() override {
         std::cout << "entry to Release" << std::endl;
-        arm().handle_joint();
+        arm().release_joint();
     }
     void react(Tick const &) override {
         // std::cout << "Tick" << std::endl;
@@ -133,7 +133,7 @@ class Release
         }
         else {
             isPreviousStateReached_=false;
-            arm().handle_joint();
+            arm().release_joint();
         }
     }
 };
@@ -225,6 +225,7 @@ std::string ArmFSM::getCurrentStateName() {
     if (ArmFSM::template is_in_state<Handle>()) return "Handle";
     if (ArmFSM::template is_in_state<Open>())   return "Open";
     if (ArmFSM::template is_in_state<Close>())  return "Close";
+    if (ArmFSM::template is_in_state<Release>())  return "Release";
     return "Unknown";
 }
 

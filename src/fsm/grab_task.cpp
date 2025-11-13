@@ -40,7 +40,7 @@ class Reaching:public ArmTaskFSM
         std::cout << "entry to Reaching" << std::endl;
 
         current_state = 0;
-        lastPrevReached = ArmFSM::isPreviousStateReached_; // 记录初始值，供上升沿检测
+        lastPrevReached = false; // 记录初始值，供上升沿检测
         isReadyToNext = false;                              // 先不允许推进，等“到达”的上升沿
 
         // 发送第一个目标
@@ -93,7 +93,7 @@ class Releasing:public ArmTaskFSM
         std::cout << "entry to Releasing" << std::endl;
 
         current_state = 0;
-        lastPrevReached = ArmFSM::isPreviousStateReached_; // 记录初始值，供上升沿检测
+        lastPrevReached = false; // 记录初始值，供上升沿检测
         isReadyToNext = false;                              // 先不允许推进，等“到达”的上升沿
 
         // 发送第一个目标

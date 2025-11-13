@@ -70,6 +70,11 @@ void ArmSpeechControl::handle_joint()
     move_all(armTargets.at("handle"));
 }
 
+void ArmSpeechControl::release_joint()
+{
+    move_all(armTargets.at("release"));
+}
+
 void ArmSpeechControl::hold_joint()
 {
     //std::cout << "[ArmSpeechControl] Holding joint position..." << std::endl;

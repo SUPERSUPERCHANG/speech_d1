@@ -46,6 +46,7 @@ public:
     void open_gripper();
     void close_gripper();
     void handle_joint();
+    void release_joint();
     void hold_joint();
     void zero_joint();
     void move_single(int id, double angleDeg);
