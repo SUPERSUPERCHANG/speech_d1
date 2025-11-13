@@ -79,7 +79,9 @@ void ArmSpeechControl::hold_joint()
 {
     //std::cout << "[ArmSpeechControl] Holding joint position..." << std::endl;
     // {0, -90, 90, 0, 0, 0, 0}
-    move_all(armTargets.at("hold"));
+    ArmJointAngles targets=armTargets.at("hold");
+    targets.angle6=feedback_angles_.angle6;
+    move_all(targets);
 }
 
 void ArmSpeechControl::zero_joint()
