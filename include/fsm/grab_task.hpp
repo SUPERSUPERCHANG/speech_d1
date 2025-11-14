@@ -40,9 +40,9 @@ public:
     /* default reaction for unhandled events */
     void react(tinyfsm::Event const &) { };
 
-    virtual void react(GrabEvent        const &) {};
-    virtual void react(ReleaseEvent        const &){};
-    virtual void react(CancelEvent        const &){};
+    void react(GrabEvent        const &) ;
+    void react(ReleaseEvent        const &);
+    void react(CancelEvent        const &);
     virtual void react(Tick const &) {  } ;
 
     virtual void entry(void) { };  /* entry actions in some states */

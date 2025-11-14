@@ -72,10 +72,6 @@ class Reaching:public ArmTaskFSM
         }
     }
 
-    void react(ReleaseEvent const&) override
-    {
-        transit<Releasing>();
-    }
 
     void exit() override
     {
@@ -99,10 +95,6 @@ class Releasing:public ArmTaskFSM
         // 发送第一个目标
         steps::releasingSteps[current_state]();
     }
-    void react(GrabEvent const & e) override
-    {
-        transit<Reaching>();
-    }
     void react(Tick const&) override
     {
         // 1) 上升沿检测：false -> true 的瞬间，才把 isReadyToNext 置为 true
@@ -122,10 +114,7 @@ class Releasing:public ArmTaskFSM
             }
         }
     }
-    void react(CancelEvent const & e) override
-    {
-        transit<Idle>();
-    }
+
     void exit() override
     {
         current_state = 0;
@@ -142,14 +131,6 @@ class Idle:public ArmTaskFSM
         isReadyToNext = false;
         lastPrevReached = false;
     }
-    void react(GrabEvent const&) override
-    {
-        transit<Reaching>();
-    }
-    void react(ReleaseEvent const&) override
-    {
-        transit<Releasing>();
-    }
     void exit() override
     {
         current_state = 0;
@@ -157,6 +138,18 @@ class Idle:public ArmTaskFSM
         lastPrevReached = false;
     }
 }; // forward declaration
+
+
+void ArmTaskFSM::react(ReleaseEvent const&)
+{
+    transit<Releasing>();
+}
+
+void ArmTaskFSM::react(GrabEvent const&)
+{
+    transit<GrabEvent>();
+}
+
 
 
 FSM_INITIAL_STATE(ArmTaskFSM, Idle)
