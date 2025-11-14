@@ -47,10 +47,7 @@ class Reaching:public ArmTaskFSM
         steps::reachingSteps[current_state]();
     }
 
-    void react(CancelEvent const&) override
-    {
-        transit<Idle>();
-    }
+
 
     void react(Tick const&) override
     {
@@ -147,9 +144,12 @@ void ArmTaskFSM::react(ReleaseEvent const&)
 
 void ArmTaskFSM::react(GrabEvent const&)
 {
-    transit<GrabEvent>();
+    transit<Reaching>();
 }
 
-
+void ArmTaskFSM::react(CancelEvent const&)
+{
+    transit<Idle>();
+}
 
 FSM_INITIAL_STATE(ArmTaskFSM, Idle)
